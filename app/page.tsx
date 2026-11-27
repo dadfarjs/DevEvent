@@ -1,8 +1,20 @@
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
 import { EVENTS } from "@/lib/constants";
+import { logHomepageRendered } from "@/lib/posthog-logs";
+import { connection } from "next/server";
+import { Suspense } from "react";
 
-export default function Home() {
+async function DynamicContent() {
+  await connection();
+
+  return "";
+}
+
+export default async function Home() {
+  await connection();
+  logHomepageRendered();
+
   return (
     <section>
       <h1 className="text-center">
@@ -24,6 +36,10 @@ export default function Home() {
           ))}
         </ul>
       </div>
+
+      <Suspense fallback={<p>Loading...</p>}>
+        <DynamicContent />
+      </Suspense>
     </section>
   );
 }
